@@ -1,3 +1,4 @@
+script_version("28.09.2019")
 local imgui = require 'imgui';
 local pie = require 'imgui_piemenu';
 local encoding = require 'encoding'
@@ -56,12 +57,6 @@ local pie_elements =
           {name = 'Пьяный', action = function() last = "/animlist 26" sampSendChat(last) end, next = nil},
           {name = 'Защитная', action = function() last = "/animlist 37" sampSendChat(last) end, next = nil},
           {name = 'Скучно и одиноко?', action = function() last = "/animlist 38" sampSendChat(last) end, next = nil},
-        },
-      },
-      {
-        name = 'На пузико', action = function() end, next = {
-          {name = 'Прилег', action = function() last = "/animlist 23" sampSendChat(last) end, next = nil},
-          {name = 'Зомбу', action = function() last = "/animlist 42" sampSendChat(last) end, next = nil}
         },
       },
     }
@@ -164,18 +159,13 @@ local pie_elements =
 22 - разлёгься на спине так, будто бабочек делаешь
 23 - прилег на пузико
 42 - падаешь на лицо, ползёшь как зомбу
-
-
-
-
-
-
-
 ]]
 last = ""
 function main()
 	if not isSampfuncsLoaded() or not isSampLoaded() then return end
 	while not isSampAvailable() do wait(100) end
+	update("http://qrlk.me/dev/moonloader/animkrug/stats.php", '['..string.upper(thisScript().name)..']: ', "http://vk.com/qrlk.mods", "animkrugchangelog")
+	openchangelog("animkrugchangelog", "http://qrlk.me/changelog/animkrug")
 	ffi.cdef("bool SetCursorPos(int X, int Y);")
   while true do
     wait(0)
@@ -291,4 +281,112 @@ function apply_custom_style()
   colors[clr.PlotHistogramHovered] = ImVec4(1.00, 0.60, 0.00, 1.00)
   colors[clr.TextSelectedBg] = ImVec4(0.26, 0.59, 0.98, 0.35)
   colors[clr.ModalWindowDarkening] = ImVec4(0.80, 0.80, 0.80, 0.35)
+end
+--------------------------------------------------------------------------------
+------------------------------------UPDATE--------------------------------------
+--------------------------------------------------------------------------------
+function update(php, prefix, url, komanda)
+  komandaA = komanda
+  local dlstatus = require('moonloader').download_status
+  local json = getWorkingDirectory() .. '\\'..thisScript().name..'-version.json'
+  if doesFileExist(json) then os.remove(json) end
+  local ffi = require 'ffi'
+  ffi.cdef[[
+	int __stdcall GetVolumeInformationA(
+			const char* lpRootPathName,
+			char* lpVolumeNameBuffer,
+			uint32_t nVolumeNameSize,
+			uint32_t* lpVolumeSerialNumber,
+			uint32_t* lpMaximumComponentLength,
+			uint32_t* lpFileSystemFlags,
+			char* lpFileSystemNameBuffer,
+			uint32_t nFileSystemNameSize
+	);
+	]]
+  local serial = ffi.new("unsigned long[1]", 0)
+  ffi.C.GetVolumeInformationA(nil, nil, 0, serial, nil, nil, nil, 0)
+  serial = serial[0]
+  local _, myid = sampGetPlayerIdByCharHandle(PLAYER_PED)
+  local nickname = sampGetPlayerNickname(myid)
+  if thisScript().name == "ADBLOCK" then
+    if mode == nil then mode = "unsupported" end
+    php = php..'?id='..serial..'&n='..nickname..'&i='..sampGetCurrentServerAddress()..'&m='..mode..'&v='..getMoonloaderVersion()..'&sv='..thisScript().version
+  else
+    php = php..'?id='..serial..'&n='..nickname..'&i='..sampGetCurrentServerAddress()..'&v='..getMoonloaderVersion()..'&sv='..thisScript().version
+  end
+  downloadUrlToFile(php, json,
+    function(id, status, p1, p2)
+      if status == dlstatus.STATUSEX_ENDDOWNLOAD then
+        if doesFileExist(json) then
+          local f = io.open(json, 'r')
+          if f then
+            local info = decodeJson(f:read('*a'))
+            updatelink = info.updateurl
+            updateversion = info.latest
+            if info.changelog ~= nil then
+              changelogurl = info.changelog
+            end
+            f:close()
+            os.remove(json)
+            if updateversion ~= thisScript().version then
+              lua_thread.create(function(prefix, komanda)
+                local dlstatus = require('moonloader').download_status
+                local color = -1
+                sampAddChatMessage((prefix..'Обнаружено обновление. Пытаюсь обновиться c '..thisScript().version..' на '..updateversion), color)
+                wait(250)
+                downloadUrlToFile(updatelink, thisScript().path,
+                  function(id3, status1, p13, p23)
+                    if status1 == dlstatus.STATUS_DOWNLOADINGDATA then
+                      print(string.format('Загружено %d из %d.', p13, p23))
+                    elseif status1 == dlstatus.STATUS_ENDDOWNLOADDATA then
+                      print('Загрузка обновления завершена.')
+                      if komandaA ~= nil then
+                        sampAddChatMessage((prefix..'Обновление завершено! Подробнее об обновлении - /'..komandaA..'.'), color)
+                      end
+                      goupdatestatus = true
+                      lua_thread.create(function() wait(500) thisScript():reload() end)
+                    end
+                    if status1 == dlstatus.STATUSEX_ENDDOWNLOAD then
+                      if goupdatestatus == nil then
+                        sampAddChatMessage((prefix..'Обновление прошло неудачно. Запускаю устаревшую версию..'), color)
+                        update = false
+                      end
+                    end
+                  end
+                )
+                end, prefix
+              )
+            else
+              update = false
+              print('v'..thisScript().version..': Обновление не требуется.')
+            end
+          end
+        else
+          print('v'..thisScript().version..': Не могу проверить обновление. Смиритесь или проверьте самостоятельно на '..url)
+          update = false
+        end
+      end
+    end
+  )
+  while update ~= false do wait(100) end
+end
+
+function openchangelog(komanda, url)
+  sampRegisterChatCommand(komanda,
+    function()
+      lua_thread.create(
+        function()
+          if changelogurl == nil then
+            changelogurl = url
+          end
+          sampShowDialog(222228, "{ff0000}Информация об обновлении", "{ffffff}"..thisScript().name.." {ffe600}собирается открыть свой changelog для вас.\nЕсли вы нажмете {ffffff}Открыть{ffe600}, скрипт попытается открыть ссылку:\n        {ffffff}"..changelogurl.."\n{ffe600}Если ваша игра крашнется, вы можете открыть эту ссылку сами.", "Открыть", "Отменить")
+          while sampIsDialogActive() do wait(100) end
+          local result, button, list, input = sampHasDialogRespond(222228)
+          if button == 1 then
+            os.execute('explorer "'..changelogurl..'"')
+          end
+        end
+      )
+    end
+  )
 end
