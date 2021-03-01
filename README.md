@@ -16,7 +16,7 @@
 
 </p>
 
-A simple **[moonloader](https://gtaforums.com/topic/890987-moonloader/)** imgui_piemenu binder for [Samp-Rp](http://samp-rp.ru/) (**[gta samp](https://sa-mp.com/)**).
+A simple **[moonloader](https://gtaforums.com/topic/890987-moonloader/)** imgui_piemenu binder for (**[gta samp](https://sa-mp.com/)**).
 
 You can use it to quickly activate animations on [Samp-Rp](http://samp-rp.ru/) or to create your own simple binder.
 
