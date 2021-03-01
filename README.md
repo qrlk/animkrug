@@ -18,6 +18,8 @@
 
 A simple **[moonloader](https://gtaforums.com/topic/890987-moonloader/)** imgui_piemenu binder for **[gta samp](https://sa-mp.com/)**.
 
+![](https://i.imgur.com/uAr41Y6.png)
+
 You can use it to quickly activate animations on [Samp-Rp](http://samp-rp.ru/) or to create your own simple binder.
 
 It requires **[CLEO 4+](http://cleo.li/?lang=ru)**, **[SAMPFUNCS 5+](https://blast.hk/threads/17/page-59#post-279414)**, **[MoonImgui](https://blast.hk/threads/19292/)** and **[ImGui PieMenu](https://www.blast.hk/threads/19648/)**.
