@@ -191,7 +191,7 @@ function main()
     else
       imgui.Process = false
       imgui.ShowCursor = false
-      imgui.SetMouseCursor(imgui.MouseCursor.None)
+      --imgui.SetMouseCursor(imgui.MouseCursor.None)
     end
   end
 end
