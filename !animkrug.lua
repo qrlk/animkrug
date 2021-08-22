@@ -166,12 +166,12 @@ local pie_elements =
 ]]
 last = ""
 function main()
-	if not isSampfuncsLoaded() or not isSampLoaded() then return end
-	while not isSampAvailable() do wait(100) end
+  if not isSampfuncsLoaded() or not isSampLoaded() then return end
+  while not isSampAvailable() do wait(100) end
   while not string.find(sampGetCurrentServerName(), "Samp-Rp.Ru", 1, true) do wait(100) end
-	update("http://qrlk.me/dev/moonloader/animkrug/stats.php", '['..string.upper(thisScript().name)..']: ', "http://vk.com/qrlk.mods", "animkrugchangelog")
-	openchangelog("animkrugchangelog", "http://qrlk.me/changelog/animkrug")
-	ffi.cdef("bool SetCursorPos(int X, int Y);")
+  update("http://qrlk.me/dev/moonloader/animkrug/stats.php", '['..string.upper(thisScript().name)..']: ', "http://vk.com/qrlk.mods", "animkrugchangelog")
+  openchangelog("animkrugchangelog", "http://qrlk.me/changelog/animkrug")
+  ffi.cdef("bool SetCursorPos(int X, int Y);")
   while true do
     wait(0)
     if isKeyDown(0x35) then
@@ -180,10 +180,10 @@ function main()
       ffi.C.SetCursorPos(sW / 2, sH / 2)
       while isKeyDown(0x35) do
         wait(0)
-				if isKeyDown(2) then
+        if isKeyDown(2) then
           if last ~= "" then
             sampSendChat(last)
-						wait(400)
+            wait(400)
           end
           break
         end
