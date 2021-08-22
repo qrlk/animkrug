@@ -1,3 +1,5 @@
+require "lib.moonloader"
+
 script_name("animkrug")
 script_version("22.08.2021")
 script_url("http://github.com/qrlk/animkrug")
