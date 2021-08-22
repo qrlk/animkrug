@@ -1,5 +1,5 @@
 script_name("animkrug")
-script_version("28.09.2019")
+script_version("22.08.2021")
 script_url("http://github.com/qrlk/animkrug")
 script_description("Simple animlist binder based on imgui_piemenu. 5 + LMB - open menu. 5 + RMB - repeat last.")
 
