@@ -1,7 +1,7 @@
 require "lib.moonloader"
 
 script_name("animkrug")
-script_version("22.08.2021")
+script_version("25.06.2022")
 script_url("http://github.com/qrlk/animkrug")
 script_description("Simple animlist binder based on imgui_piemenu. 5 + LMB - open menu. 5 + RMB - repeat last.")
 
